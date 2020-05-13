@@ -1,0 +1,18 @@
+﻿<Window x:Class="ZoomURLGetter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="Auto" Width="525" SizeToContent="Height">
+    <Grid>
+        <StackPanel x:Name="panel" Background="Azure">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="CallGraphButton" Content="Call Microsoft Graph API" HorizontalAlignment="Right" Padding="5" Click="CallGraphButton_Click" Margin="5" FontFamily="Segoe Ui"/>
+                <Button x:Name="SignOutButton" Content="Sign-Out" HorizontalAlignment="Right" Padding="5" Click="SignOutButton_Click" Margin="5" Visibility="Collapsed" FontFamily="Segoe Ui"/>
+            </StackPanel>
+            <Label Content="API Call Results" Margin="0,0,0,-5" FontFamily="Segoe Ui" />
+            <RichTextBox DockPanel.Dock="Top" Name="richTB" Height="200" IsDocumentEnabled="True" IsReadOnly="True"/>
+        </StackPanel>
+    </Grid>
+</Window>
