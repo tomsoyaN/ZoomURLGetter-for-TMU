@@ -12,6 +12,7 @@ using System.Windows.Documents;
 using System.Windows.Navigation;
 using System.Diagnostics;
 using System.Windows.Markup;
+using System.Linq.Expressions;
 
 namespace ZoomURLGetter
 {
@@ -50,46 +51,53 @@ namespace ZoomURLGetter
                 //string startDate = DateTime.Now.AddDays(-14).ToString("yyyy-MM-dd");
                 string startDate = "2020-05-01";
                 var date_filter = "ReceivedDateTime ge " + startDate + " and receivedDateTime lt " + enddate;
-                var messages = await graphClient.Me.Messages
-                .Request()
-                .Filter(date_filter + " and " + address_filter)
-                .Select(o => new
-                {
-                    o.Id,
-                    o.Subject,
-                    o.WebLink,
-                    o.Body,
-                    o.ToRecipients
-
-                })
-                .OrderBy("receivedDateTime desc")
-                .GetAsync();
-                int c = 0;
-                Paragraph parx = new Paragraph();
-                var pageIteretor = PageIterator<Message>
-                    .CreatePageIterator(graphClient, messages, (m) =>
+                try{
+                    var messages = await graphClient.Me.Messages
+                    .Request()
+                    .Filter(date_filter + " and " + address_filter)
+                    .Select(o => new
                     {
-                        if (IsContainingZoomURL(m.Body.Content))
+                        o.Id,
+                        o.Subject,
+                        o.WebLink,
+                        o.Body,
+                        o.ToRecipients
+
+                    })
+                    .OrderBy("receivedDateTime desc")
+                    .GetAsync();
+                    int c = 0;
+                    Paragraph parx = new Paragraph();
+                    var pageIteretor = PageIterator<Message>
+                        .CreatePageIterator(graphClient, messages, (m) =>
                         {
-                            content = m.Body.Content;
-                            Run r1 = new Run(m.Subject + "\n");
-                            Run r2 = new Run("メールを表示" + "\n");
-                            Hyperlink hl = new Hyperlink(r2);
-                            hl.NavigateUri = new Uri(m.WebLink);
-                            hl.RequestNavigate += new RequestNavigateEventHandler(link_RequestNavigate);
-                            parx.Inlines.Add(r1);
-                            parx.Inlines.Add(hl);
-                        }
+                            if (IsContainingZoomURL(m.Body.Content))
+                            {
+                                content = m.Body.Content;
+                                Run r1 = new Run(m.Subject + "\n");
+                                Run r2 = new Run("メールを表示" + "\n");
+                                Hyperlink hl = new Hyperlink(r2);
+                                hl.NavigateUri = new Uri(m.WebLink);
+                                hl.RequestNavigate += new RequestNavigateEventHandler(link_RequestNavigate);
+                                parx.Inlines.Add(r1);
+                                parx.Inlines.Add(hl);
+                            }
 
-                        return true;
+                            return true;
 
-                    });
-                await pageIteretor.IterateAsync();
-                FlowDocument document = new FlowDocument();
-                document.Blocks.Add(parx);
-                richTB.Document = document;
+                        });
+                    await pageIteretor.IterateAsync();
+                    FlowDocument document = new FlowDocument();
+                    document.Blocks.Add(parx);
+                    richTB.Document = document;
+                    this.SignOutButton.Visibility = Visibility.Visible;
+                }
+                catch
+                {
+                    MessageBox.Show("Error");
+                }
             }
-            this.SignOutButton.Visibility = Visibility.Visible;
+            
         }
         private void link_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
@@ -154,6 +162,8 @@ namespace ZoomURLGetter
                 }
                 catch (MsalException msalex)
                 {
+                    MessageBox.Show("Please Login with TMU Address");
+                    throw new Exception();
                 }
             }
             var usertoken = authResult.AccessToken;
