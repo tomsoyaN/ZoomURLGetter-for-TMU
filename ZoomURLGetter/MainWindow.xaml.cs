@@ -10,6 +10,8 @@ using System.Net.Http.Headers;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Navigation;
+using System.Diagnostics;
+using System.Windows.Markup;
 
 namespace ZoomURLGetter
 {
@@ -22,11 +24,11 @@ namespace ZoomURLGetter
         //Set the API Endpoint to Graph 'me' endpoint. 
         // To change from Microsoft public cloud to a national cloud, use another value of graphAPIEndpoint.
         // Reference with Graph endpoints here: https://docs.microsoft.com/graph/deployments#microsoft-graph-and-graph-explorer-service-root-endpoints
-        string graphAPIEndpoint = "https://graph.microsoft.com/v1.0/me/messages?$select=sender";
 
         //Set the scope for API call to user.read
         string[] scopes = new string[] { "Mail.Read" };
         GraphServiceClient graphClient = null;
+        string content = "";
 
 
         public MainWindow()
@@ -45,20 +47,22 @@ namespace ZoomURLGetter
                 //var user = graphClient.Me.Request().GetAsync().Result;
                 var address_filter = "from/emailAddress/address eq 'no-reply@kibaco.tmu.ac.jp'";
                 string enddate = DateTime.Now.ToString("yyyy-MM-dd");
-                string startDate = DateTime.Now.AddDays(-14).ToString("yyyy-MM-dd");
+                //string startDate = DateTime.Now.AddDays(-14).ToString("yyyy-MM-dd");
+                string startDate = "2020-05-01";
                 var date_filter = "ReceivedDateTime ge " + startDate + " and receivedDateTime lt " + enddate;
                 var messages = await graphClient.Me.Messages
                 .Request()
-                .Filter(date_filter)
+                .Filter(date_filter + " and " + address_filter)
                 .Select(o => new
                 {
                     o.Id,
                     o.Subject,
                     o.WebLink,
-                    o.Body
+                    o.Body,
+                    o.ToRecipients
 
                 })
-                .OrderBy("receivedDateTime")
+                .OrderBy("receivedDateTime desc")
                 .GetAsync();
                 int c = 0;
                 Paragraph parx = new Paragraph();
@@ -67,6 +71,7 @@ namespace ZoomURLGetter
                     {
                         if (IsContainingZoomURL(m.Body.Content))
                         {
+                            content = m.Body.Content;
                             Run r1 = new Run(m.Subject + "\n");
                             Run r2 = new Run("メールを表示" + "\n");
                             Hyperlink hl = new Hyperlink(r2);
@@ -88,7 +93,9 @@ namespace ZoomURLGetter
         }
         private void link_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            System.Diagnostics.Process.Start(e.Uri.AbsoluteUri.ToString());
+            var sub = new SubWindow(content);
+            sub.ShowDialog();
+            //System.Diagnostics.Process.Start(e.Uri.AbsoluteUri.ToString());
             e.Handled = true;
         }
 
