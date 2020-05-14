@@ -6,6 +6,7 @@ Kibacoが落ちててZoomURLが分からない！という非常事態のとき�
 https://1drv.ms/u/s!ArNbpC7I1GPWgp4SONrZPPXz8auEUQ?e=zqIMbt
 
 ## 仕様
+・Windowsのみ対応です。
 ・現在のところ一覧表示機能のみです。  
 ・Kibacoから自動送信されたメールのみ対応しています。　　  
 ・5/1~のメールを表示します。  
@@ -19,4 +20,14 @@ https://1drv.ms/u/s!ArNbpC7I1GPWgp4SONrZPPXz8auEUQ?e=zqIMbt
 ### singn-outボタン
 sign-outボタンを押すとサインアウトします。  
 通常、sing-outボタンを押さない限り次回起動時もログイン状態は保持されます。
+
+##  開発環境
+・Visual Studio 2019 Community  
+・.Net Frame Work 4.7.2  
+・Microsoft Graph API v 1.0  
+・Microsoft Graph .NET Client Library  
+
+##  参考
+[MicrosoftGraph](https://docs.microsoft.com/ja-jp/graph/overview)  
+[Microsoft Graph .NET Client Libraryを使ったAPIの呼び出しサンプル](https://www.ka-net.org/blog/?p=10169)  
 
